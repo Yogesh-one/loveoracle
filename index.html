@@ -11,25 +11,29 @@
     :root {
       --gradient-angle: -45deg;
     }
+    /* Base styles for full-screen centered layout */
     body {
       font-family: 'Great Vibes', cursive;
       text-align: center;
-      /* Animated gradient: pink, violet, blue */
       background: linear-gradient(var(--gradient-angle), #ff6b6b, #ff8e8e, #ffb3b3, #d291ff, #8e8eff);
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
-      min-height: 100vh;
       margin: 0;
-      overflow: hidden;
-      position: relative;
+      overflow-x: hidden;
       color: #4a4a4a;
+      /* Use Flexbox to center content vertically & horizontally */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 10px;
     }
     @keyframes gradientBG {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    /* Floating hearts, emoji rain, and fireworks */
+    /* Floating elements */
     .hearts, .emoji-rain, .fireworks {
       position: absolute;
       width: 100%;
@@ -45,12 +49,11 @@
       0% { transform: translateY(110vh) rotate(0deg); opacity: 1; }
       100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
     }
-    /* Container and message box */
+    /* Container and message boxes */
     .container {
+      width: 100%;
       max-width: 600px;
-      margin: 0 auto;
       padding: 20px;
-      position: relative;
       z-index: 1;
     }
     .message-box {
@@ -58,7 +61,9 @@
       padding: 30px;
       border-radius: 20px;
       box-shadow: 0 0 30px rgba(255, 65, 129, 0.3);
-      margin: 20px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 600px;
       animation: fadeIn 1s;
     }
     @keyframes fadeIn {
@@ -67,12 +72,13 @@
     }
     input {
       padding: 12px;
-      margin: 15px;
+      margin: 10px auto;
       border: 3px solid #ff4081;
       border-radius: 25px;
       font-size: 18px;
-      width: 80%;
-      max-width: 200px;
+      width: 90%;
+      max-width: 250px;
+      display: block;
       transition: transform 0.3s;
     }
     input:focus {
@@ -89,13 +95,16 @@
       cursor: pointer;
       transition: transform 0.3s;
       margin: 10px;
+      display: inline-block;
+      width: 90%;
+      max-width: 250px;
     }
     button:hover {
       transform: scale(1.1) rotate(3deg);
     }
     /* Compatibility meter */
     .compatibility-meter {
-      width: 80%;
+      width: 90%;
       height: 30px;
       background: #ffe6e6;
       border-radius: 15px;
@@ -107,7 +116,7 @@
       background: linear-gradient(90deg, #ff6b6b, #ff4081);
       transition: width 2s ease-in-out;
     }
-    /* Fireworks and pulse animations */
+    /* Fireworks & pulse */
     .fireworks {
       top: 0;
       left: 0;
@@ -137,7 +146,7 @@
       opacity: 0.7;
       margin-top: 20px;
     }
-    /* Watermark (always visible on page) */
+    /* Watermark */
     .watermark {
       position: fixed;
       bottom: 10px;
@@ -145,7 +154,7 @@
       font-size: 14px;
       opacity: 0.6;
     }
-    /* Snapshot card for sharing – only shown when triggered */
+    /* Snapshot card for sharing */
     .snapshot-card {
       background: rgba(255, 255, 255, 0.95);
       padding: 20px;
@@ -162,10 +171,18 @@
       width: 100%;
       border-radius: 10px;
     }
-    @media (max-width: 600px) {
-      input { width: 80%!important; }
-      button { padding: 12px 24px; }
-      .message-box { margin: 10px; padding: 20px; }
+    /* Responsive tweaks for very small screens */
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2em;
+      }
+      input, button {
+        font-size: 16px;
+        padding: 10px 20px;
+      }
+      .message-box {
+        padding: 20px;
+      }
     }
   </style>
 </head>
