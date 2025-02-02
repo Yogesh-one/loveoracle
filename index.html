@@ -2,6 +2,8 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <!-- Responsive meta tag -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Love Oracle 🔮</title>
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
@@ -11,7 +13,7 @@
     :root {
       --gradient-angle: -45deg;
     }
-    /* Base styles for full-screen centered layout */
+    /* Base styles for full-screen background */
     body {
       font-family: 'Great Vibes', cursive;
       text-align: center;
@@ -21,12 +23,6 @@
       margin: 0;
       overflow-x: hidden;
       color: #4a4a4a;
-      /* Use Flexbox to center content vertically & horizontally */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 10px;
     }
     @keyframes gradientBG {
       0% { background-position: 0% 50%; }
@@ -49,13 +45,15 @@
       0% { transform: translateY(110vh) rotate(0deg); opacity: 1; }
       100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
     }
-    /* Container and message boxes */
+    /* Container: centered card with limited width */
     .container {
       width: 100%;
       max-width: 600px;
       padding: 20px;
+      margin: 40px auto;
       z-index: 1;
     }
+    /* Card style: no blur, standard background */
     .message-box {
       background: rgba(255, 255, 255, 0.95);
       padding: 30px;
@@ -65,21 +63,24 @@
       width: 90%;
       max-width: 600px;
       animation: fadeIn 1s;
+      overflow-y: auto;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    input {
+    input, button {
       padding: 12px;
       margin: 10px auto;
-      border: 3px solid #ff4081;
-      border-radius: 25px;
       font-size: 18px;
-      width: 90%;
-      max-width: 250px;
       display: block;
       transition: transform 0.3s;
+    }
+    input {
+      border: 3px solid #ff4081;
+      border-radius: 25px;
+      width: 90%;
+      max-width: 250px;
     }
     input:focus {
       transform: scale(1.05);
@@ -89,13 +90,10 @@
       background: #ff4081;
       color: white;
       border: none;
-      padding: 15px 30px;
       border-radius: 25px;
-      font-size: 18px;
       cursor: pointer;
-      transition: transform 0.3s;
+      padding: 15px 30px;
       margin: 10px;
-      display: inline-block;
       width: 90%;
       max-width: 250px;
     }
@@ -142,17 +140,10 @@
       100% { transform: scale(1); }
     }
     .disclaimer {
+      font-family: sans-serif;
       font-size: 12px;
       opacity: 0.7;
       margin-top: 20px;
-    }
-    /* Watermark */
-    .watermark {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      font-size: 14px;
-      opacity: 0.6;
     }
     /* Snapshot card for sharing */
     .snapshot-card {
@@ -170,6 +161,10 @@
     .snapshot-card img {
       width: 100%;
       border-radius: 10px;
+    }
+    /* Hide the zodiac birthdate inputs by default */
+    #zodiacInputs {
+      display: none;
     }
     /* Responsive tweaks for very small screens */
     @media (max-width: 480px) {
@@ -198,11 +193,23 @@
       <h1 style="font-size: 2.5em; margin: 0;">🔮 Cosmic Cupid's Playground 💘</h1>
       <p style="font-size: 1.2em;">Where Algorithms Meet Romance... Sort Of</p>
       
+      <!-- Checkbox to show/hide zodiac inputs -->
+      <label style="font-size: 16px; display: block; margin-bottom: 10px;">
+        <input type="checkbox" id="showZodiac" onchange="toggleZodiacInputs()"> Show Zodiac Details
+      </label>
+      
+      <!-- Zodiac birthdate inputs (hidden by default) -->
+      <div id="zodiacInputs">
+        <input type="date" id="userBirth" placeholder="Your Birthdate">
+        <input type="date" id="crushBirth" placeholder="Crush's Birthdate">
+      </div>
+      
       <input type="text" id="userName" placeholder="Your Name">
       <input type="text" id="crushName" placeholder="Crush's Name">
       <br>
       <button onclick="calculateCompatibility()">🌌 Launch Love Radar 🌌</button>
       <button onclick="showSingleFortune()">🎪 Lonely Hearts Club 🎪</button>
+      <p class="disclaimer">🔒 Rest assured, your data is never stored or shared – it lives only in your browser!</p>
     </div>
 
     <!-- Result Area -->
@@ -214,9 +221,6 @@
       <p class="disclaimer">⚠️ Disclaimer: This cosmic match is just a fun projection by unicorns & stardust. Not scientifically proven! 🦄</p>
     </div>
   </div>
-
-  <!-- Watermark -->
-  <div class="watermark">curated with love by Yogesh 💖</div>
 
   <!-- Snapshot Card (for sharing snapshot) -->
   <div class="snapshot-card" id="snapshotCard">
@@ -242,16 +246,70 @@
     }
     createHearts();
 
+    // Toggle the display of zodiac inputs based on the checkbox state
+    function toggleZodiacInputs() {
+      const zodiacInputs = document.getElementById('zodiacInputs');
+      const showZodiac = document.getElementById('showZodiac').checked;
+      zodiacInputs.style.display = showZodiac ? 'block' : 'none';
+    }
+
+    // Array of unique quotes for every result combination (now unused)
+    const quotes = [
+      "Love is the ultimate adventure.",
+      "Two souls, one destiny.",
+      "When hearts align, magic happens.",
+      "Every beat tells a story.",
+      "Destiny dances with love.",
+      "Romance is in the stardust.",
+      "A spark can ignite the universe.",
+      "Fate whispers in every heartbeat.",
+      "Together, we are infinite.",
+      "The stars themselves envy your bond.",
+      "Love: the rarest gem of life.",
+      "Passion paints the canvas of fate."
+    ];
+
+    // ====================== ZODIAC SIGN FUNCTION ======================
+    function getZodiacSign(dateString) {
+      if (!dateString) return "Unknown";
+      const date = new Date(dateString);
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return "Aquarius";
+      if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return "Pisces";
+      if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return "Aries";
+      if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return "Taurus";
+      if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return "Gemini";
+      if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return "Cancer";
+      if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return "Leo";
+      if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return "Virgo";
+      if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return "Libra";
+      if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return "Scorpio";
+      if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return "Sagittarius";
+      if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return "Capricorn";
+      return "Unknown";
+    }
+
     // ====================== LOVE CALCULATION ENGINE ======================
     function calculateCompatibility() {
-      const userName = document.getElementById('userName').value.trim() || "";
-      const crushName = document.getElementById('crushName').value.trim() || "";
+      const userName = document.getElementById('userName').value.trim();
+      const crushName = document.getElementById('crushName').value.trim();
+      const showZodiac = document.getElementById('showZodiac').checked;
+      let userZodiac = "", crushZodiac = "";
+      
+      // If zodiac details are requested, read the birthdates and compute zodiac signs.
+      if (showZodiac) {
+        const userBirth = document.getElementById('userBirth').value;
+        const crushBirth = document.getElementById('crushBirth').value;
+        userZodiac = getZodiacSign(userBirth);
+        crushZodiac = getZodiacSign(crushBirth);
+      }
 
-      // If one or both fields are empty, show a humorous prompt
+      // If one or both name fields are empty, show a humorous prompt
       if (!userName || !crushName) {
         showResult(`
           <h2>🤔 Oops! Did you forget something?</h2>
-          <p>Either your name or your crush's name is missing. Maybe you're too shy or lost in daydreams? 😏</p>
+          <p>Either your name or your crush's name is missing. Maybe you're too lost in daydreams? 😏</p>
           <div style="font-size: 40px">🕵️‍♂️</div>
           ${createEmojiRain('😅🤷‍♂️', 20)}
         `);
@@ -275,26 +333,42 @@
         return;
       }
 
-      // Deterministic calculation using names
+      // Deterministic calculation using names with extra random factor for more fun
       const loveHash = (userName + crushName).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const percentage = Math.abs(loveHash) % 101;
+      const basePercentage = Math.abs(loveHash) % 101;
+      // Add a random factor between -5 and +4
+      const randomFactor = Math.floor(Math.random() * 10) - 5;
+      let percentage = basePercentage + randomFactor;
+      percentage = Math.max(0, Math.min(100, percentage));
+
       const emojiTheme = getEmojiTheme(percentage);
+      const extraAnimation = getExtraAnimation(percentage);
+
+      // Conditionally include zodiac info if requested
+      let zodiacDisplay = "";
+      if (showZodiac) {
+        zodiacDisplay = `<p>Your Zodiac: ${userZodiac} | Crush's Zodiac: ${crushZodiac}</p>`;
+      }
 
       showResult(`
         ${createEmojiRain(emojiTheme.symbols, emojiTheme.count)}
         <h2>${userName} & ${crushName}</h2>
+        ${zodiacDisplay}
         <div class="compatibility-meter">
-          <div class="progress" style="width: ${percentage}%"></div>
+          <div class="progress" style="width: ${percentage}%;"></div>
         </div>
         <h3>${percentage}% Cosmic Connection</h3>
-        <p>${getCompatibilityMessage(percentage)}</p>
+        <p>${getCompatibilityMessage(percentage)} ${emojiTheme.symbols}</p>
         ${percentage >= 90 ? "<div class='pulse'>🎉</div><p>🚨 ALERT: Love so intense it might just lead to a wedding! 💍</p>" : ""}
         ${createStarRating(percentage)}
         ${getExtraReward(percentage)}
+        ${extraAnimation}
       `);
 
       // Add extra animations based on percentage
-      if (percentage >= 90) {
+      if (percentage === 100) {
+        addPremiumFireworks(); // premium animation for a perfect match
+      } else if (percentage >= 90) {
         addFireworks('✨');
         setTimeout(() => addFireworks('🎇'), 500);
       } else {
@@ -312,10 +386,17 @@
         "🛌 Embrace the Bed Hog Life – your comfort is a priority!",
         "🚫 No-Sharing Chocolate Policy: Strictly enforced!"
       ];
+      const extraRemarks = [
+        "Remember: Being single means endless self-love and spontaneous adventures!",
+        "Embrace the freedom – you're the boss of your own love story!",
+        "Single and spectacular: the world is your runway!",
+        "Rock your independence like a true trendsetter!"
+      ];
       showResult(`
         ${createEmojiRain('😎🍷📚🎧', 25)}
         <h2>✨ Single & Spectacular Forecast ✨</h2>
         <p>${fortunes[Math.floor(Math.random() * fortunes.length)]}</p>
+        <p>${extraRemarks[Math.floor(Math.random()*extraRemarks.length)]}</p>
         <div style="font-size: 40px">${['🦄', '🌟', '🎪', '🎮'][Math.floor(Math.random()*4)]}</div>
         <p>🔮 Your cosmic vibe today: "${['Netflix Marathon', 'Spa Day Extravaganza', 'Cheesecake Heist'][Math.floor(Math.random()*3)]}"</p>
       `);
@@ -357,12 +438,14 @@
     }
 
     function createStarRating(percentage) {
-      const stars = '★'.repeat(Math.floor(percentage/20)) + '☆'.repeat(5 - Math.floor(percentage/20));
-      return `<div style="font-size: 30px; color: #ffd700">${stars}</div>`;
+      const fullStars = '★'.repeat(Math.floor(percentage / 20));
+      const emptyStars = '☆'.repeat(5 - Math.floor(percentage / 20));
+      return `<div style="font-size: 30px; color: #ffd700">${fullStars}${emptyStars}</div>`;
     }
 
     function getExtraReward(percentage) {
-      return percentage >= 90 ? "<p>🎁 Bonus: A virtual shower of confetti and cosmic high-fives! 🎉</p>" :
+      return percentage >= 100 ? "<p>🎁 Premium Bonus: A majestic shower of golden stardust and celestial high-fives! 👑</p>" :
+             percentage >= 90 ? "<p>🎁 Bonus: A virtual shower of confetti and cosmic high-fives! 🎉</p>" :
              percentage >= 70 ? "<p>🎈 Achievement Unlocked: 'Hopeful Romantic' Badge! 🏅</p>" : "";
     }
 
@@ -382,7 +465,16 @@
       } else {
         messages = ["💔 Nuclear rejection zone!", "☠️ Better luck in the next life!", "🪦 RIP your love life."];
       }
-      return messages[Math.floor(Math.random() * messages.length)] + " " + getEmojiTheme(percentage).symbols;
+      return messages[Math.floor(Math.random() * messages.length)];
+    }
+
+    // Extra animations for rare matches
+    function getExtraAnimation(percentage) {
+      if (percentage === 100) {
+        // Extra premium animation for 100% match
+        return `<div style="font-size: 50px; animation: pulse 1s infinite;">👑</div>`;
+      }
+      return "";
     }
 
     // Show the result content and hide the main input area.
@@ -413,7 +505,7 @@
       for (let i = 0; i < 50; i++) {
         const confetti = document.createElement('div');
         confetti.style.position = 'fixed';
-        confetti.style.backgroundColor = `hsl(${Math.random() * 360}deg, 100%, 50%)`;
+        confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
         confetti.style.left = Math.random() * 100 + 'vw';
         confetti.style.top = '-10px';
         confetti.style.width = '8px';
@@ -433,13 +525,40 @@
         firework.className = 'firework';
         firework.style.left = Math.random() * 100 + 'vw';
         firework.style.top = Math.random() * 100 + 'vh';
-        firework.style.color = `hsl(${Math.random() * 360}deg, 100%, 50%)`;
+        firework.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
         firework.innerHTML = emoji || '✨';
         firework.style.fontSize = '30px';
         container.appendChild(firework);
         setTimeout(() => firework.remove(), 1000);
       }
     }
+
+    // Premium fireworks for 100% match
+    function addPremiumFireworks() {
+      const container = document.getElementById('fireworks');
+      for (let i = 0; i < 20; i++) {
+        const firework = document.createElement('div');
+        firework.className = 'firework';
+        firework.style.left = Math.random() * 100 + 'vw';
+        firework.style.top = Math.random() * 100 + 'vh';
+        firework.style.color = `gold`;
+        firework.innerHTML = '👑';
+        firework.style.fontSize = '40px';
+        container.appendChild(firework);
+        setTimeout(() => firework.remove(), 1500);
+      }
+    }
+
+    // Add falling animation keyframes dynamically for confetti
+    const styleSheet = document.createElement("style");
+    styleSheet.type = "text/css";
+    styleSheet.innerText = `
+      @keyframes fall {
+        0% { transform: translateY(0); opacity: 1; }
+        100% { transform: translateY(110vh); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(styleSheet);
   </script>
 </body>
 </html>
