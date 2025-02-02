@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Love Oracle 🔮</title>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+  <!-- html2canvas library for snapshot functionality -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --gradient-angle: -45deg;
+    }
+    body {
+      font-family: 'Great Vibes', cursive;
+      text-align: center;
+      /* Animated gradient: pink, violet, blue */
+      background: linear-gradient(var(--gradient-angle), #ff6b6b, #ff8e8e, #ffb3b3, #d291ff, #8e8eff);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      min-height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      position: relative;
+      color: #4a4a4a;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    /* Floating hearts, emoji rain, and fireworks */
+    .hearts, .emoji-rain, .fireworks {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .heart, .emoji {
+      position: absolute;
+      animation: float 8s linear infinite;
+      opacity: 0;
+    }
+    @keyframes float {
+      0% { transform: translateY(110vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+    }
+    /* Container and message box */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .message-box {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(255, 65, 129, 0.3);
+      margin: 20px;
+      animation: fadeIn 1s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    input {
+      padding: 12px;
+      margin: 15px;
+      border: 3px solid #ff4081;
+      border-radius: 25px;
+      font-size: 18px;
+      width: 80%;
+      max-width: 200px;
+      transition: transform 0.3s;
+    }
+    input:focus {
+      transform: scale(1.05);
+      outline: none;
+    }
+    button {
+      background: #ff4081;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 25px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: transform 0.3s;
+      margin: 10px;
+    }
+    button:hover {
+      transform: scale(1.1) rotate(3deg);
+    }
+    /* Compatibility meter */
+    .compatibility-meter {
+      width: 80%;
+      height: 30px;
+      background: #ffe6e6;
+      border-radius: 15px;
+      margin: 20px auto;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, #ff6b6b, #ff4081);
+      transition: width 2s ease-in-out;
+    }
+    /* Fireworks and pulse animations */
+    .fireworks {
+      top: 0;
+      left: 0;
+      z-index: 2;
+    }
+    .firework {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      animation: explode 1s ease-out;
+    }
+    @keyframes explode {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(10); opacity: 0; }
+    }
+    .pulse {
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .disclaimer {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-top: 20px;
+    }
+    /* Watermark (always visible on page) */
+    .watermark {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-size: 14px;
+      opacity: 0.6;
+    }
+    /* Snapshot card for sharing – only shown when triggered */
+    .snapshot-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(255, 65, 129, 0.3);
+      margin: 20px auto;
+      max-width: 400px;
+      display: none;
+    }
+    .snapshot-card h2 {
+      margin-top: 0;
+    }
+    .snapshot-card img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    @media (max-width: 600px) {
+      input { width: 80%!important; }
+      button { padding: 12px 24px; }
+      .message-box { margin: 10px; padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating animations -->
+  <div class="hearts" id="hearts"></div>
+  <div class="emoji-rain" id="emojiRain"></div>
+  <div class="fireworks" id="fireworks"></div>
+  
+  <div class="container">
+    <!-- Main Input Area -->
+    <div class="message-box" id="main-content">
+      <h1 style="font-size: 2.5em; margin: 0;">🔮 Cosmic Cupid's Playground 💘</h1>
+      <p style="font-size: 1.2em;">Where Algorithms Meet Romance... Sort Of</p>
+      
+      <input type="text" id="userName" placeholder="Your Name">
+      <input type="text" id="crushName" placeholder="Crush's Name">
+      <br>
+      <button onclick="calculateCompatibility()">🌌 Launch Love Radar 🌌</button>
+      <button onclick="showSingleFortune()">🎪 Lonely Hearts Club 🎪</button>
+    </div>
+
+    <!-- Result Area -->
+    <div id="result-container" class="message-box" style="display: none;">
+      <div id="result-content"></div>
+      <button onclick="location.reload()">🔄 Spin Again 🔄</button>
+      <!-- "Add to Story" button -->
+      <button onclick="shareResult()">📢 Add to Story 📢</button>
+      <p class="disclaimer">⚠️ Disclaimer: This cosmic match is just a fun projection by unicorns & stardust. Not scientifically proven! 🦄</p>
+    </div>
+  </div>
+
+  <!-- Watermark -->
+  <div class="watermark">curated with love by Yogesh 💖</div>
+
+  <!-- Snapshot Card (for sharing snapshot) -->
+  <div class="snapshot-card" id="snapshotCard">
+    <h2>Your Cosmic Love Snapshot 🌌</h2>
+    <div id="snapshotContent"></div>
+    <!-- The download button will be hidden during snapshot capture -->
+    <button id="downloadBtn" onclick="downloadSnapshot()">📥 Download Snapshot</button>
+  </div>
+
+  <script>
+    // ====================== CORE FUNCTIONALITY ======================
+    // Create floating hearts
+    function createHearts() {
+      const heartsContainer = document.getElementById('hearts');
+      for (let i = 0; i < 20; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.style.left = Math.random() * 100 + '%';
+        heart.style.animationDelay = Math.random() * 5 + 's';
+        heart.innerHTML = '❤';
+        heartsContainer.appendChild(heart);
+      }
+    }
+    createHearts();
+
+    // ====================== LOVE CALCULATION ENGINE ======================
+    function calculateCompatibility() {
+      const userName = document.getElementById('userName').value.trim() || "";
+      const crushName = document.getElementById('crushName').value.trim() || "";
+
+      // If one or both fields are empty, show a humorous prompt
+      if (!userName || !crushName) {
+        showResult(`
+          <h2>🤔 Oops! Did you forget something?</h2>
+          <p>Either your name or your crush's name is missing. Maybe you're too shy or lost in daydreams? 😏</p>
+          <div style="font-size: 40px">🕵️‍♂️</div>
+          ${createEmojiRain('😅🤷‍♂️', 20)}
+        `);
+        return;
+      }
+
+      // Edge case: Narcissism detector (same name)
+      if (userName.toLowerCase() === crushName.toLowerCase()) {
+        showResult(`
+          <div class="pulse">💖</div>
+          <h2>${userName} & ${userName}</h2>
+          <div class="compatibility-meter">
+            <div class="progress" style="width: 100%"></div>
+          </div>
+          <h3>200% Cosmic Self-Love!</h3>
+          <p>🏆 Wow! You've won the Self-Love Olympics. Who needs a crush when you're this awesome?</p>
+          <p>🎵 Anthem: "I'm My Own Soulmate" 🎶</p>
+          ${createEmojiRain('💁‍♂️💅👑', 30)}
+        `);
+        addFireworks('🌈');
+        return;
+      }
+
+      // Deterministic calculation using names
+      const loveHash = (userName + crushName).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const percentage = Math.abs(loveHash) % 101;
+      const emojiTheme = getEmojiTheme(percentage);
+
+      showResult(`
+        ${createEmojiRain(emojiTheme.symbols, emojiTheme.count)}
+        <h2>${userName} & ${crushName}</h2>
+        <div class="compatibility-meter">
+          <div class="progress" style="width: ${percentage}%"></div>
+        </div>
+        <h3>${percentage}% Cosmic Connection</h3>
+        <p>${getCompatibilityMessage(percentage)}</p>
+        ${percentage >= 90 ? "<div class='pulse'>🎉</div><p>🚨 ALERT: Love so intense it might just lead to a wedding! 💍</p>" : ""}
+        ${createStarRating(percentage)}
+        ${getExtraReward(percentage)}
+      `);
+
+      // Add extra animations based on percentage
+      if (percentage >= 90) {
+        addFireworks('✨');
+        setTimeout(() => addFireworks('🎇'), 500);
+      } else {
+        addConfetti();
+      }
+    }
+
+    // ====================== SINGLE'S FORTUNE MODE ======================
+    function showSingleFortune() {
+      const fortunes = [
+        "🐾 Adopt ALL the cats. Become the Crazy Cat Royalty of your neighborhood!",
+        "🍕 Date Yourself! After all, pizza never judges you.",
+        "🎮 Virtual Love > Real Drama – Level Up your single life!",
+        "💸 Silver Lining: No annoying in-laws to crash your vibe!",
+        "🛌 Embrace the Bed Hog Life – your comfort is a priority!",
+        "🚫 No-Sharing Chocolate Policy: Strictly enforced!"
+      ];
+      showResult(`
+        ${createEmojiRain('😎🍷📚🎧', 25)}
+        <h2>✨ Single & Spectacular Forecast ✨</h2>
+        <p>${fortunes[Math.floor(Math.random() * fortunes.length)]}</p>
+        <div style="font-size: 40px">${['🦄', '🌟', '🎪', '🎮'][Math.floor(Math.random()*4)]}</div>
+        <p>🔮 Your cosmic vibe today: "${['Netflix Marathon', 'Spa Day Extravaganza', 'Cheesecake Heist'][Math.floor(Math.random()*3)]}"</p>
+      `);
+      addConfetti();
+    }
+
+    // ====================== SNAPSHOT / SHARE FUNCTIONALITY ======================
+    // When the user clicks "Add to Story," show the snapshot card.
+    function shareResult() {
+      const snapshotCard = document.getElementById('snapshotCard');
+      const snapshotContent = document.getElementById('snapshotContent');
+      // Copy the result content into the snapshot card.
+      snapshotContent.innerHTML = document.getElementById('result-content').innerHTML;
+      snapshotCard.style.display = 'block';
+    }
+    // Download the snapshot as an image; temporarily hide the download button.
+    function downloadSnapshot() {
+      const snapshotCard = document.getElementById('snapshotCard');
+      const downloadBtn = document.getElementById('downloadBtn');
+      // Hide the download button so it doesn't appear in the snapshot.
+      downloadBtn.style.display = 'none';
+      html2canvas(snapshotCard).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'love-oracle-snapshot.png';
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        // Restore the download button after snapshot is taken.
+        downloadBtn.style.display = 'block';
+      });
+    }
+
+    // ====================== UTILITY FUNCTIONS ======================
+    function getEmojiTheme(percentage) {
+      return percentage >= 90 ? { symbols: '💘🌟🎉💍👰', count: 40 } :
+             percentage >= 70 ? { symbols: '💖🎀💐🥂', count: 25 } :
+             percentage >= 50 ? { symbols: '💕🌹✨🤝', count: 15 } :
+             percentage >= 30 ? { symbols: '💔☔🌧️🚬', count: 10 } :
+             { symbols: '💀☠️👻🚫', count: 20 };
+    }
+
+    function createStarRating(percentage) {
+      const stars = '★'.repeat(Math.floor(percentage/20)) + '☆'.repeat(5 - Math.floor(percentage/20));
+      return `<div style="font-size: 30px; color: #ffd700">${stars}</div>`;
+    }
+
+    function getExtraReward(percentage) {
+      return percentage >= 90 ? "<p>🎁 Bonus: A virtual shower of confetti and cosmic high-fives! 🎉</p>" :
+             percentage >= 70 ? "<p>🎈 Achievement Unlocked: 'Hopeful Romantic' Badge! 🏅</p>" : "";
+    }
+
+    // Unique humorous messages for compatibility tiers
+    function getCompatibilityMessage(percentage) {
+      let messages;
+      if (percentage >= 90) {
+        messages = ["💥 You're a rom-com in motion!", "🚀 Love rocket activated!", "🤯 Mind-blowing chemistry detected!"];
+      } else if (percentage >= 70) {
+        messages = ["🔥 Sparks are flying!", "🎯 Cupid's arrow almost hit the bullseye!", "🧲 Magnetic attraction in progress!"];
+      } else if (percentage >= 50) {
+        messages = ["🎢 Relationship rollercoaster ahead!", "🤷‍♀️ Could go either way...", "💼 Keep that day job just in case."];
+      } else if (percentage >= 30) {
+        messages = ["🤔 'It's complicated' is loading...", "🎭 Drama level: Shakespearean!", "🍷 Wine & cry package recommended."];
+      } else if (percentage >= 10) {
+        messages = ["👻 Ghosting probability: 99%!", "🧊 Certified cold shoulder specialist!", "🚫 Romance not found (404 error)."];
+      } else {
+        messages = ["💔 Nuclear rejection zone!", "☠️ Better luck in the next life!", "🪦 RIP your love life."];
+      }
+      return messages[Math.floor(Math.random() * messages.length)] + " " + getEmojiTheme(percentage).symbols;
+    }
+
+    // Show the result content and hide the main input area.
+    function showResult(content) {
+      document.getElementById('main-content').style.display = 'none';
+      document.getElementById('result-container').style.display = 'block';
+      document.getElementById('result-content').innerHTML = content;
+    }
+
+    // Create emoji rain effect on the background.
+    function createEmojiRain(symbols, count) {
+      const container = document.getElementById('emojiRain');
+      container.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const emoji = document.createElement('div');
+        emoji.className = 'emoji';
+        emoji.style.left = Math.random() * 100 + '%';
+        emoji.style.animationDelay = Math.random() * 2 + 's';
+        emoji.style.fontSize = Math.random() * 20 + 15 + 'px';
+        emoji.innerHTML = symbols[Math.floor(Math.random() * symbols.length)];
+        container.appendChild(emoji);
+      }
+      return '';
+    }
+
+    // Add confetti falling from the top.
+    function addConfetti() {
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.style.position = 'fixed';
+        confetti.style.backgroundColor = `hsl(${Math.random() * 360}deg, 100%, 50%)`;
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.top = '-10px';
+        confetti.style.width = '8px';
+        confetti.style.height = '8px';
+        confetti.style.borderRadius = '50%';
+        confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear`;
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 5000);
+      }
+    }
+
+    // Add fireworks animation at random positions.
+    function addFireworks(emoji) {
+      const container = document.getElementById('fireworks');
+      for (let i = 0; i < 15; i++) {
+        const firework = document.createElement('div');
+        firework.className = 'firework';
+        firework.style.left = Math.random() * 100 + 'vw';
+        firework.style.top = Math.random() * 100 + 'vh';
+        firework.style.color = `hsl(${Math.random() * 360}deg, 100%, 50%)`;
+        firework.innerHTML = emoji || '✨';
+        firework.style.fontSize = '30px';
+        container.appendChild(firework);
+        setTimeout(() => firework.remove(), 1000);
+      }
+    }
+  </script>
+</body>
+</html>
